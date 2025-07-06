@@ -37,7 +37,7 @@
                     <td><%= user.getEmail() %></td>
                     <td><%= user.getRole() %></td>
                     <td>
-                        <button class="btn btn-info btn-sm" onclick="viewUser(<%= user.getId() %>)">View</button>
+                        <button class="btn btn-success btn-sm" onclick="viewUser(<%= user.getId() %>)">View</button>
                         <button class="btn btn-warning btn-sm" onclick="editUser(<%= user.getId() %>)">Edit</button>
                         <button class="btn btn-danger btn-sm" onclick="confirmDelete(<%= user.getId() %>)">Delete</button>
                     </td>
@@ -104,6 +104,7 @@
                 document.getElementById("name").value = data.name;
                 document.getElementById("email").value = data.email;
                 document.getElementById("password").value = "";
+				document.getElementById("password").placeholder = "Leave blank to keep current password";
                 document.getElementById("role").value = data.role;
                 new bootstrap.Modal(document.getElementById("userModal")).show();
             });

@@ -35,7 +35,9 @@ public class UserService {
     	if (userRepository.existsByEmail(user.getEmail())) {
             businessErrors.add(new ObjectError("email", "The email address is already in use"));
         }
-
+    	
+    	validatePasswordStrength(user.getPassword(), businessErrors);
+    	
         if (!businessErrors.isEmpty()) {
             throw new BusinessValidationException(businessErrors);
         }
@@ -55,7 +57,41 @@ public class UserService {
 
     // Actualizar usuario
     public User update(User user) {
-        return userRepository.save(user);
+    	Optional<User> existing = userRepository.findById(user.getId());
+        if (existing.isPresent()) {
+            User userToUpdate = existing.get();
+            
+            List<ObjectError> businessErrors = new ArrayList<>();
+            
+            User existingByEmail = userRepository.findByEmail(user.getEmail());
+            
+            if (existingByEmail != null && existingByEmail.getId() != userToUpdate.getId()) {
+                businessErrors.add(new ObjectError("email", "The email address is already in use"));
+            }
+
+            if (!businessErrors.isEmpty()) {
+                throw new BusinessValidationException(businessErrors);
+            }
+            
+            userToUpdate.setName(user.getName());
+            userToUpdate.setEmail(user.getEmail());
+            userToUpdate.setRole(user.getRole());
+            
+            // Solo actualiza el password si viene uno nuevo
+            if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            	
+            	validatePasswordStrength(user.getPassword(), businessErrors);
+            	
+            	if (!businessErrors.isEmpty()) {
+                    throw new BusinessValidationException(businessErrors);
+                }
+            	
+                userToUpdate.setPassword(user.getPassword());
+            }
+
+            return userRepository.save(userToUpdate);
+        }
+    	return null;
     }
 
     // Eliminación lógica (soft delete)
@@ -75,5 +111,18 @@ public class UserService {
     //Busca un usuario por email
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+    
+    //validacion para verificar el password como regla de negocio
+    private void validatePasswordStrength(String password, List<ObjectError> businessErrors) {
+        if (password == null || password.isBlank()) {
+            return; // No validar si está vacía (esto se maneja solo en creación)
+        }
+
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$";
+
+        if (!password.matches(regex)) {
+            businessErrors.add(new ObjectError("password", "Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, and one number"));
+        }
     }
 }

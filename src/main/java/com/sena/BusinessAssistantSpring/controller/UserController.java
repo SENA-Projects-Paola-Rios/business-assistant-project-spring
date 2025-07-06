@@ -91,7 +91,12 @@ public class UserController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-        userService.save(user);
+        if(user.getId() == null) {
+        	userService.save(user);
+        } else {
+        	userService.update(user);
+        }
+        
         
         //manejo de la respuesta cuando todo salio bien
         return ResponseEntity.ok("Category saved successfully");

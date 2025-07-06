@@ -45,7 +45,7 @@
                     <td><%= category.getName() %></td>
                     <td><%= category.getDescription() %></td>
                     <td>
-                        <button class="btn btn-info btn-sm" onclick="viewCategory(<%= category.getId() %>)">View</button>
+                        <button class="btn btn-success btn-sm" onclick="viewCategory(<%= category.getId() %>)">View</button>
                         <button class="btn btn-warning btn-sm" onclick="editCategory(<%= category.getId() %>)">Edit</button>
                         <button class="btn btn-danger btn-sm" onclick="confirmDelete(<%= category.getId() %>)">Delete</button>
                     </td>

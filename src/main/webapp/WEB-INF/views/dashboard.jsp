@@ -6,9 +6,6 @@
 
 <%
     User loggedUser = (User) request.getAttribute("loggedUser");
-	System.out.println("antes");
-	System.out.println(loggedUser);
-	System.out.println("despues");
 %>
 
 <!-- Contenido principal -->
