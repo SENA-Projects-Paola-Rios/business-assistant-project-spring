@@ -2,11 +2,13 @@ package com.sena.BusinessAssistantSpring.controller;
 
 import com.sena.BusinessAssistantSpring.model.User;
 import com.sena.BusinessAssistantSpring.service.UserService;
+import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,8 +40,11 @@ public class UserController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable int id, Model model) {
         Optional<User> user = userService.getById(id);
-        user.ifPresent(u -> model.addAttribute("user", u));
-        return "user/user-form";
+        if (user.isPresent()) {
+            model.addAttribute("user", user.get());
+            return "user/user-form";
+        }
+        return "redirect:/users";
     }
 
     // Ver detalles de usuario
@@ -57,7 +62,6 @@ public class UserController {
         return userService.getById(id).orElse(null);
     }
 
-
     // Eliminar usuario (soft delete)
     @GetMapping("/delete/{id}")
     public String deleteUser(@PathVariable int id) {
@@ -65,23 +69,30 @@ public class UserController {
         return "redirect:/users";
     }
 
-    // Guardar usuario nuevo o editado
+    // Guardar usuario nuevo o editado con validación
     @PostMapping("/save")
-    public String saveUser(@RequestParam(required = false) Integer id,
-                           @RequestParam String name,
-                           @RequestParam String email,
-                           @RequestParam String password,
-                           @RequestParam String role) {
+    public String saveUser(@Valid @ModelAttribute("user") User user,
+                           BindingResult result,
+                           Model model) {
+    	
+    	System.out.println("ID: " + user.getId());
+    	System.out.println("Name: '" + user.getName() + "'");
+    	
+    	System.out.println("Has errors: " + result.hasErrors());
+    	result.getAllErrors().forEach(e -> System.out.println("Error: " + e.getDefaultMessage()));
 
-        if (id == null) {
-            // Crear
-            User newUser = new User(name, email, password, role);
-            userService.create(newUser);
-        } else {
-            // Actualizar
-            User updatedUser = new User(id, name, email, password, role, null);
-            userService.update(updatedUser);
+        if (result.hasErrors()) {
+            // Regresa al formulario si hay errores de validación
+            return "user/user-form";
         }
+
+       /* if (user.getId() <0 ) {
+            // Crear nuevo usuario
+            userService.create(user);
+        } else {
+            // Actualizar usuario existente
+            userService.update(user);
+        }*/
 
         return "redirect:/users";
     }

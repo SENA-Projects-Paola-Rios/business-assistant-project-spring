@@ -16,7 +16,6 @@ public class DashboardController {
             return "redirect:/login"; // Redirige si no hay sesión activa
         }
 
-        // Puedes pasar datos al modelo si lo necesitas
         model.addAttribute("user", loggedUser);
 
         return "dashboard"; // Apunta a /WEB-INF/views/dashboard.jsp si usas JSP

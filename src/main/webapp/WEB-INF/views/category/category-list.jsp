@@ -23,7 +23,7 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2>Category List</h2>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoryModal">Add Category</button>
+            <button class="btn btn-primary" onclick="openNewCategoryModal()">Add Category</button>
         </div>
 
         <table class="table table-striped table-bordered">
@@ -67,8 +67,6 @@
 
 <jsp:include page="category-modal.jsp" />
 
-
-<!-- View Category Modal -->
 <div class="modal fade" id="viewCategoryModal" tabindex="-1" aria-labelledby="viewCategoryModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -100,10 +98,6 @@
                 document.getElementById("viewCategoryName").textContent = data.name;
                 document.getElementById("viewCategoryDescription").textContent = data.description;
                 new bootstrap.Modal(document.getElementById("viewCategoryModal")).show();
-            })
-            .catch(error => {
-                alert("Error fetching category data.");
-                console.error(error);
             });
     }
 
@@ -116,6 +110,46 @@
                 document.getElementById("categoryDescription").value = data.description;
                 new bootstrap.Modal(document.getElementById("categoryModal")).show();
             });
+    }
+
+    function openNewCategoryModal() {
+        document.getElementById("categoryId").value = "";
+        document.getElementById("categoryName").value = "";
+        document.getElementById("categoryDescription").value = "";
+        new bootstrap.Modal(document.getElementById("categoryModal")).show();
+    }
+
+    function submitCategoryForm(event) {
+        event.preventDefault();
+
+        const id = document.getElementById("categoryId").value;
+        const name = document.getElementById("categoryName").value;
+        const description = document.getElementById("categoryDescription").value;
+
+        fetch("${pageContext.request.contextPath}/categories/save-ajax", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: id ? parseInt(id) : 0,
+                name: name,
+                description: description
+            })
+        })
+        .then(response => {
+            if (!response.ok) return response.json().then(data => { throw data; });
+            return response.text();
+        })
+        .then(() => {
+            alert("Category saved successfully!");
+            location.reload();
+        })
+        .catch(errors => {
+            let msg = "Validation errors:\n";
+            errors.forEach(e => msg += "- " + e.defaultMessage + "\n");
+            alert(msg);
+        });
     }
 </script>
 

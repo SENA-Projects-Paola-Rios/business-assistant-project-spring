@@ -2,10 +2,12 @@ package com.sena.BusinessAssistantSpring.service;
 
 import com.sena.BusinessAssistantSpring.model.Category;
 import com.sena.BusinessAssistantSpring.repository.CategoryRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,14 +34,8 @@ public class CategoryService {
     }
 
     //nos permite borrar un usuario de manera logica colocando una fecha de borrado en la columna deleted at
-    public boolean softDelete(int id) {
-        Optional<Category> optional = categoryRepository.findById(id);
-        if (optional.isPresent()) {
-            Category category = optional.get();
-            category.setDeletedAt(new Timestamp(System.currentTimeMillis()));
-            categoryRepository.save(category);
-            return true;
-        }
-        return false;
+    @Transactional
+    public void softDelete(int id) {
+        categoryRepository.deleteById(id);
     }
 }
