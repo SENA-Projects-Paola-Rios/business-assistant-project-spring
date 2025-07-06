@@ -1,19 +1,36 @@
 package com.sena.BusinessAssistantSpring.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user")
 public class User {
- 
-    @Id 
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotBlank(message = "The name is required")
+    @Size(min = 2, max = 50, message = "The name must be between 2 and 50 characters")
+    @Column(nullable = false)
     private String name;
+
+    @NotBlank(message = "The email is required")
+    @Email(message = "The email must be valid")
+    @Size(max = 100, message = "The email must be less than 100 characters")
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @NotBlank(message = "The password is required")
+    @Size(min = 6, max = 100, message = "The password must be between 6 and 100 characters")
+    @Column(nullable = false)
     private String password;
+
+    @NotBlank(message = "The role is required")
+    @Pattern(regexp = "^(ADMIN|USER|MANAGER)$", message = "The role must be ADMIN, USER, or MANAGER")
+    @Column(nullable = false)
     private String role;
 
     @Column(name = "deleted_at")

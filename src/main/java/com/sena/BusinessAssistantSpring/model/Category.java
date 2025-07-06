@@ -1,6 +1,8 @@
 package com.sena.BusinessAssistantSpring.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
 import java.sql.Timestamp;
 
 @Entity
@@ -9,19 +11,23 @@ public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // Cambiado de int a Integer
+    private Integer id;
 
+    @NotBlank(message = "The name is required")
+    @Size(min = 3, max = 50, message = "The name must be between 3 and 50 characters")
+    @Pattern(regexp = "^(Hygiene|Medicine|Food|Beverages)$", message = "Category name must be one of: Hygiene, Medicine, Food, Beverages")
     @Column(nullable = false)
     private String name;
 
+    @NotBlank(message = "The description is required")
+    @Size(min = 5, max = 200, message = "The description must be between 5 and 200 characters")
     @Column(nullable = false)
     private String description;
 
     @Column(name = "deleted_at")
     private Timestamp deletedAt;
 
-    public Category() {
-    }
+    public Category() {}
 
     // Constructor completo
     public Category(Integer id, String name, String description, Timestamp deletedAt) {
@@ -51,10 +57,6 @@ public class Category {
     }
 
     public void setName(String name) {
-        if (!name.equals("Hygiene") && !name.equals("Medicine") &&
-            !name.equals("Food") && !name.equals("Beverages")) {
-            throw new IllegalArgumentException("Invalid category name: " + name);
-        }
         this.name = name;
     }
 
