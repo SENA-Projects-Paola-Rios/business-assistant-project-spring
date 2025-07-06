@@ -1,10 +1,13 @@
 package com.sena.BusinessAssistantSpring.service;
 
+import com.sena.BusinessAssistantSpring.exception.BusinessValidationException;
 import com.sena.BusinessAssistantSpring.model.User;
 import com.sena.BusinessAssistantSpring.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.ObjectError;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +15,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    
 
     // ✅ Constructor explícito para evitar errores en entornos avanzados
     public UserService(UserRepository userRepository) {
@@ -20,6 +24,22 @@ public class UserService {
 
     // Crear usuario
     public User create(User user) {
+        return userRepository.save(user);
+    }
+    
+    //guarda una usuario
+    public User save(User user) {
+    	
+    	List<ObjectError> businessErrors = new ArrayList<>();
+    	
+    	if (userRepository.existsByEmail(user.getEmail())) {
+            businessErrors.add(new ObjectError("email", "The email address is already in use"));
+        }
+
+        if (!businessErrors.isEmpty()) {
+            throw new BusinessValidationException(businessErrors);
+        }
+        
         return userRepository.save(user);
     }
 

@@ -1,7 +1,10 @@
 package com.sena.BusinessAssistantSpring.model;
 
+import com.sena.BusinessAssistantSpring.model.validation.Create;
+import com.sena.BusinessAssistantSpring.model.validation.Update;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,37 +13,40 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Null(groups = Create.class, message = "ID must be null when creating a new user")
+    @NotNull(groups = Update.class, message = "ID is required when updating")
+    private Integer id;
 
-    @NotBlank(message = "The name is required")
-    @Size(min = 2, max = 50, message = "The name must be between 2 and 50 characters")
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s'-]+$", message = "Name can only contain letters, spaces, apostrophes and hyphens")
     @Column(nullable = false)
     private String name;
 
-    @NotBlank(message = "The email is required")
-    @Email(message = "The email must be valid")
-    @Size(max = 100, message = "The email must be less than 100 characters")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
+    @Size(max = 100, message = "Email must be less than 100 characters")
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "The password is required")
-    @Size(min = 6, max = 100, message = "The password must be between 6 and 100 characters")
+    @NotBlank(groups = Create.class, message = "Password is required")
+    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
     @Column(nullable = false)
     private String password;
 
-    @NotBlank(message = "The role is required")
-    @Pattern(regexp = "^(ADMIN|USER|MANAGER)$", message = "The role must be ADMIN, USER, or MANAGER")
+    @NotBlank(message = "Role is required")
+    @Pattern(regexp = "^(ADMIN|USER|MANAGER)$", message = "Role must be ADMIN, USER, or MANAGER")
     @Column(nullable = false)
     private String role;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    // Constructor vacío requerido por JPA
+    // Constructors
+
     public User() {}
 
-    // Constructor completo
-    public User(int id, String name, String email, String password, String role, LocalDateTime deletedAt) {
+    public User(Integer id, String name, String email, String password, String role, LocalDateTime deletedAt) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -49,7 +55,6 @@ public class User {
         this.deletedAt = deletedAt;
     }
 
-    // Constructor para nuevo usuario
     public User(String name, String email, String password, String role) {
         this.name = name;
         this.email = email;
@@ -57,12 +62,13 @@ public class User {
         this.role = role;
     }
 
-    // Getters y Setters
-    public int getId() {
+    // Getters and setters
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
