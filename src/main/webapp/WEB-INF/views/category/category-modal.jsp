@@ -10,14 +10,8 @@
         <input type="hidden" name="id" id="categoryId">
 
         <div class="mb-3">
-          <label for="categoryName" class="form-label">Category Name</label>
-          <select class="form-select" id="categoryName" name="name" >
-            <option value="">-- Select Category --</option>
-            <option value="Hygiene">Hygiene</option>
-            <option value="Medicine">Medicine</option>
-            <option value="Food">Food</option>
-            <option value="Beverages">Beverages</option>
-          </select>
+          <label for="categoryName" class="form-label">Name</label>
+          <input type="text" class="form-control" id="categoryName" name="name">
         </div>
 
         <div class="mb-3">

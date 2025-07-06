@@ -1,5 +1,6 @@
 package com.sena.BusinessAssistantSpring.service;
 
+import com.sena.BusinessAssistantSpring.exception.BusinessValidationException;
 import com.sena.BusinessAssistantSpring.model.Category;
 import com.sena.BusinessAssistantSpring.repository.CategoryRepository;
 
@@ -7,7 +8,9 @@ import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.ObjectError;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +33,15 @@ public class CategoryService {
 
     //guarda una categoria
     public Category save(Category category) {
+    	List<ObjectError> businessErrors = new ArrayList<>();
+    	
+    	if (categoryRepository.existsByName(category.getName())) {
+            businessErrors.add(new ObjectError("name", "The category name is already in use"));
+        }
+
+        if (!businessErrors.isEmpty()) {
+            throw new BusinessValidationException(businessErrors);
+        }
         return categoryRepository.save(category);
     }
 

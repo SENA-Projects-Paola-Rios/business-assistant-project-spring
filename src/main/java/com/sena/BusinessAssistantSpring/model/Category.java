@@ -23,9 +23,10 @@ public class Category {
     private Integer id;
 
 	@NotBlank(message = "Name is required")
-	@Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
-	@Pattern(regexp = "^[A-Za-zÀ-ÿ0-9\\s-]+$", message = "Name can only contain letters, numbers, spaces and hyphens")
-	private String name;
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s'-]+$", message = "Name can only contain letters, spaces, apostrophes and hyphens")
+    @Column(nullable = false)
+    private String name;
 	
 	@NotBlank(message = "Description is required")
 	@Size(min = 5, max = 255, message = "Description must be between 5 and 255 characters")
@@ -66,10 +67,6 @@ public class Category {
     }
 
     public void setName(String name) {
-        if (!name.equals("Hygiene") && !name.equals("Medicine") &&
-            !name.equals("Food") && !name.equals("Beverages")) {
-            throw new IllegalArgumentException("Invalid category name: " + name);
-        }
         this.name = name;
     }
 

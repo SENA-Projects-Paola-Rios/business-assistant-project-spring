@@ -10,4 +10,6 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
     // Personalizado: obtener solo categorías no eliminadas
     List<Category> findByDeletedAtIsNull();
+    
+    boolean existsByName(String name);
 }
