@@ -1,5 +1,6 @@
 package com.sena.BusinessAssistantSpring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sena.BusinessAssistantSpring.model.validation.Create;
 import com.sena.BusinessAssistantSpring.model.validation.Update;
 import jakarta.persistence.*;
@@ -29,6 +30,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    
     @NotBlank(groups = Create.class, message = "Password is required")
     @Size(groups = Create.class, min = 6, max = 100, message = "Password must be between 6 and 100 characters")
     private String password;

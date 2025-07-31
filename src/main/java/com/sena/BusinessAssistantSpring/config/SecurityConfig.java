@@ -1,6 +1,9 @@
 package com.sena.BusinessAssistantSpring.config;
 
 import com.sena.BusinessAssistantSpring.filter.JwtRequestFilter;
+import com.sena.BusinessAssistantSpring.security.CustomAccessDeniedHandler;
+import com.sena.BusinessAssistantSpring.security.JwtAuthenticationEntryPoint;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.sena.BusinessAssistantSpring.config.CustomErrorController;
 
 @Configuration
 @EnableWebSecurity
@@ -29,11 +33,20 @@ public class SecurityConfig {
     private JwtRequestFilter jwtRequestFilter;
     
     private UserDetailsService userDetailsService;
+    
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     // Constructor manual para inyectar el filtro
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter, UserDetailsService userDetailsService) {
+    public SecurityConfig(JwtRequestFilter jwtRequestFilter, 
+    		UserDetailsService userDetailsService, 
+    		CustomAccessDeniedHandler accessDeniedHandler,
+    		JwtAuthenticationEntryPoint authenticationEntryPoint) {
         this.jwtRequestFilter = jwtRequestFilter;
         this.userDetailsService = userDetailsService;
+        this.accessDeniedHandler = accessDeniedHandler;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Bean
@@ -44,6 +57,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
+            .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint(this.authenticationEntryPoint) // 401
+                    .accessDeniedHandler(this.accessDeniedHandler)           // 403
+                )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
