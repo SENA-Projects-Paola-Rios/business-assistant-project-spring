@@ -1,6 +1,8 @@
 package com.sena.BusinessAssistantSpring.util;
 
 import io.jsonwebtoken.*;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +19,8 @@ public class JwtUtil {
 	 * aca se implementan metodos de firma y generacion de token, tambien de validacion
 	 */
 
-    private final String SECRET_KEY = "mysecretkey1234567890";
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     // Generar token
     public String generateToken(UserDetails userDetails) {
@@ -32,7 +35,7 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 horas
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY) // ← Método antiguo
+                .signWith(SignatureAlgorithm.HS256, this.secretKey)
                 .compact();
     }
 
@@ -61,7 +64,7 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(this.secretKey)
                 .parseClaimsJws(token)
                 .getBody();
     }
