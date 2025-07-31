@@ -63,7 +63,14 @@ public class UserService {
             
             List<ObjectError> businessErrors = new ArrayList<>();
             
-            User existingByEmail = userRepository.findByEmail(user.getEmail());
+            User existingByEmail = null;
+            
+            Optional<User> optionalUser = userRepository.findByEmail(user.getEmail());
+
+            if (optionalUser.isPresent()) {
+                existingByEmail = optionalUser.get();
+                // Ya existe un usuario con ese correo
+            }
             
             if (existingByEmail != null && existingByEmail.getId() != userToUpdate.getId()) {
                 businessErrors.add(new ObjectError("email", "The email address is already in use"));
@@ -110,7 +117,12 @@ public class UserService {
     
     //Busca un usuario por email
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    	Optional<User> optionalUser = userRepository.findByEmail(email);
+
+    	if (optionalUser.isPresent()) {
+    	    return optionalUser.get();
+    	}
+        return null;
     }
     
     //validacion para verificar el password como regla de negocio

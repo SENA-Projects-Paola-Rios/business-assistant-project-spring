@@ -1,19 +1,14 @@
 package com.sena.BusinessAssistantSpring.controller;
 
-import com.sena.BusinessAssistantSpring.model.Category;
 import com.sena.BusinessAssistantSpring.model.User;
-import com.sena.BusinessAssistantSpring.model.validation.Create;
-import com.sena.BusinessAssistantSpring.model.validation.Update;
 import com.sena.BusinessAssistantSpring.service.UserService;
 import jakarta.validation.Valid;
-import jakarta.validation.groups.Default;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
