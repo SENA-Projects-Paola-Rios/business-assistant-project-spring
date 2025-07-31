@@ -1,6 +1,5 @@
 package com.sena.BusinessAssistantSpring.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sena.BusinessAssistantSpring.model.validation.Create;
 import com.sena.BusinessAssistantSpring.model.validation.Update;
 import jakarta.persistence.*;
