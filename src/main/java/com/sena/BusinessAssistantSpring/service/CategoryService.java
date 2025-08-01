@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.ObjectError;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,34 +21,39 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    //devuelve todo el listado de categorias
+    // Devuelve todo el listado de categorías no eliminadas
     public List<Category> findAll() {
         return categoryRepository.findByDeletedAtIsNull();
     }
 
-    //busca un categoria por id
+    // Busca una categoría por ID (si no ha sido eliminada)
     public Optional<Category> findById(int id) {
         return categoryRepository.findById(id)
                 .filter(c -> c.getDeletedAt() == null);
     }
 
-    //guarda una categoria
+    // Guarda una categoría (con validación de nombre único)
     public Category save(Category category) {
-    	List<ObjectError> businessErrors = new ArrayList<>();
-    	
-    	if (categoryRepository.existsByName(category.getName())) {
+        List<ObjectError> businessErrors = new ArrayList<>();
+
+        if (categoryRepository.existsByName(category.getName())) {
             businessErrors.add(new ObjectError("name", "The category name is already in use"));
         }
 
         if (!businessErrors.isEmpty()) {
             throw new BusinessValidationException(businessErrors);
         }
+
         return categoryRepository.save(category);
     }
 
-    //nos permite borrar un usuario de manera logica colocando una fecha de borrado en la columna deleted at
+    // Realiza un borrado lógico de la categoría (marca deletedAt con la fecha actual)
     @Transactional
-    public void softDelete(int id) {
-        categoryRepository.deleteById(id);
+    public boolean softDelete(int id) {
+        return categoryRepository.findById(id).map(category -> {
+        	category.setDeletedAt(java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            categoryRepository.save(category);
+            return true;
+        }).orElse(false);
     }
 }
