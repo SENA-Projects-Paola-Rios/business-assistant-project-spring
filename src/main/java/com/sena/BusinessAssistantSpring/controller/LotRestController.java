@@ -1,5 +1,6 @@
 package com.sena.BusinessAssistantSpring.controller;
 
+import com.sena.BusinessAssistantSpring.dto.LotDTO;
 import com.sena.BusinessAssistantSpring.exception.ResourceNotFoundException;
 import com.sena.BusinessAssistantSpring.model.Lot;
 import com.sena.BusinessAssistantSpring.service.LotService;
@@ -20,21 +21,47 @@ public class LotRestController {
     private LotService lotService;
 
     /**
-     * Obtener todos los lotes activos.
+     * Obtener todos los lotes activos (que no han sido eliminados lógicamente).
      */
     @GetMapping
-    public ResponseEntity<List<Lot>> getAllLots() {
-        return ResponseEntity.ok(lotService.findAll());
+    public ResponseEntity<List<LotDTO>> getAllLots() {
+        List<LotDTO> dtos = lotService.findAll().stream()
+            .map(lot -> new LotDTO(
+                lot.getId(),
+                lot.getManufacturerLot(),
+                lot.getExpirationDate(),
+                lot.getStock(),
+                lot.getProduct().getId(),
+                lot.getProduct().getName()
+            ))
+            .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 
     /**
-     * Obtener un lote por su ID.
+     * Obtener un lote específico por su ID.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getLotById(@PathVariable int id) {
+    public ResponseEntity<LotDTO> getLotById(@PathVariable int id) {
         Optional<Lot> lot = lotService.findById(id);
-        return lot.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException("Lot with ID " + id + " not found"));
+
+        if (lot.isEmpty()) {
+            throw new ResourceNotFoundException("Lot with ID " + id + " not found");
+        }
+
+        Lot entity = lot.get();
+
+        LotDTO dto = new LotDTO(
+            entity.getId(),
+            entity.getManufacturerLot(),
+            entity.getExpirationDate(),
+            entity.getStock(),
+            entity.getProduct().getId(),
+            entity.getProduct().getName()
+        );
+
+        return ResponseEntity.ok(dto);
     }
 
     /**
