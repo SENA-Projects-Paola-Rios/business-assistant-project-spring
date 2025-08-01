@@ -1,7 +1,6 @@
 package com.sena.BusinessAssistantSpring.repository;
 
 import com.sena.BusinessAssistantSpring.model.Report;
-import com.sena.BusinessAssistantSpring.model.ReportType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,9 +9,12 @@ import java.util.List;
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Integer> {
 
-    // Obtener todos los reportes no eliminados
+    // Devuelve solo los reportes que no han sido eliminados lógicamente
     List<Report> findByDeletedAtIsNull();
 
-    // Obtener reportes por tipo
-    List<Report> findByReportTypeAndDeletedAtIsNull(ReportType reportType);
+    // Verifica si existe un reporte con el mismo slug
+    boolean existsBySlug(String slug);
+
+    // Verifica si existe un reporte con el mismo slug pero con ID diferente (para validación al editar)
+    boolean existsBySlugAndIdNot(String slug, Integer id);
 }

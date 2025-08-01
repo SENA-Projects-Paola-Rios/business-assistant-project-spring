@@ -2,9 +2,7 @@ package com.sena.BusinessAssistantSpring.controller;
 
 import com.sena.BusinessAssistantSpring.exception.ResourceNotFoundException;
 import com.sena.BusinessAssistantSpring.model.Report;
-import com.sena.BusinessAssistantSpring.model.ReportType;
 import com.sena.BusinessAssistantSpring.service.ReportService;
-
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +19,7 @@ public class ReportRestController {
     private ReportService reportService;
 
     /**
-     * Listar todos los reportes activos.
+     * Obtener todos los reportes activos (no eliminados).
      */
     @GetMapping
     public ResponseEntity<List<Report>> getAllReports() {
@@ -29,7 +27,7 @@ public class ReportRestController {
     }
 
     /**
-     * Buscar un reporte por su ID.
+     * Obtener un reporte por su ID.
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> getReportById(@PathVariable int id) {
@@ -39,15 +37,7 @@ public class ReportRestController {
     }
 
     /**
-     * Buscar reportes por tipo.
-     */
-    @GetMapping("/type/{type}")
-    public ResponseEntity<List<Report>> getReportsByType(@PathVariable ReportType type) {
-        return ResponseEntity.ok(reportService.findByType(type));
-    }
-
-    /**
-     * Crear nuevo reporte.
+     * Crear un nuevo reporte.
      */
     @PostMapping
     public ResponseEntity<?> createReport(@Valid @RequestBody Report report) {
@@ -60,11 +50,12 @@ public class ReportRestController {
     }
 
     /**
-     * Actualizar reporte existente.
+     * Actualizar un reporte existente.
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> updateReport(@PathVariable int id, @Valid @RequestBody Report report) {
-        if (reportService.findById(id).isEmpty()) {
+        Optional<Report> existing = reportService.findById(id);
+        if (existing.isEmpty()) {
             return ResponseEntity.status(404).body("{\"message\": \"Report not found\"}");
         }
         report.setId(id);
@@ -73,11 +64,12 @@ public class ReportRestController {
     }
 
     /**
-     * Eliminar reporte (borrado lógico).
+     * Eliminar un reporte (borrado lógico).
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteReport(@PathVariable int id) {
-        if (reportService.findById(id).isEmpty()) {
+        Optional<Report> existing = reportService.findById(id);
+        if (existing.isEmpty()) {
             return ResponseEntity.status(404).body("{\"message\": \"Report not found\"}");
         }
         reportService.softDelete(id);

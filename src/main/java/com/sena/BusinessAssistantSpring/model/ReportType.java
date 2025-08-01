@@ -1,8 +1,11 @@
 package com.sena.BusinessAssistantSpring.model;
 
+/**
+ * Enum que representa los diferentes tipos de reporte posibles.
+ */
 public enum ReportType {
-    sales,
-    inventory,
-    products,
-    alerts
+    SALES,
+    INVENTORY,
+    PRODUCTS,
+    ALERTS
 }
