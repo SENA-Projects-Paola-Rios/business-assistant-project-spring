@@ -1,5 +1,6 @@
 package com.sena.BusinessAssistantSpring.controller;
 
+import com.sena.BusinessAssistantSpring.dto.ProductCategoryDTO;
 import com.sena.BusinessAssistantSpring.exception.ResourceNotFoundException;
 import com.sena.BusinessAssistantSpring.model.ProductCategory;
 import com.sena.BusinessAssistantSpring.model.ProductCategoryId;
@@ -24,35 +25,80 @@ public class ProductCategoryRestController {
      * Obtener todas las asociaciones activas entre productos y categorías.
      */
     @GetMapping
-    public ResponseEntity<List<ProductCategory>> getAll() {
-        return ResponseEntity.ok(productCategoryService.findAll());
+    public ResponseEntity<List<ProductCategoryDTO>> getAll() {
+        List<ProductCategoryDTO> dtoList = productCategoryService.findAll().stream()
+            .map(pc -> new ProductCategoryDTO(
+                pc.getProduct().getId(),
+                pc.getProduct().getName(),
+                pc.getCategory().getId(),
+                pc.getCategory().getName()
+            ))
+            .toList();
+
+        return ResponseEntity.ok(dtoList);
     }
 
     /**
-     * Obtener relación producto-categoría por ID compuesto.
+     * Obtener una relación específica entre producto y categoría por IDs.
      */
     @GetMapping("/product/{productId}/category/{categoryId}")
-    public ResponseEntity<?> getById(@PathVariable int productId, @PathVariable int categoryId) {
+    public ResponseEntity<ProductCategoryDTO> getById(@PathVariable int productId, @PathVariable int categoryId) {
         ProductCategoryId id = new ProductCategoryId(productId, categoryId);
-        Optional<ProductCategory> pc = productCategoryService.findById(id);
-        return pc.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException("ProductCategory not found"));
+        Optional<ProductCategory> optionalPc = productCategoryService.findById(id);
+
+        if (optionalPc.isEmpty()) {
+            throw new ResourceNotFoundException("ProductCategory not found");
+        }
+
+        ProductCategory pc = optionalPc.get();
+
+        ProductCategoryDTO dto = new ProductCategoryDTO(
+            pc.getProduct().getId(),
+            pc.getProduct().getName(),
+            pc.getCategory().getId(),
+            pc.getCategory().getName()
+        );
+
+        return ResponseEntity.ok(dto);
     }
 
     /**
-     * Obtener relaciones por producto.
+     * Obtener todas las relaciones activas de una categoría por ID de producto.
      */
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<ProductCategory>> getByProduct(@PathVariable int productId) {
-        return ResponseEntity.ok(productCategoryService.findByProductId(productId));
+    public ResponseEntity<List<ProductCategoryDTO>> getByProduct(@PathVariable int productId) {
+        List<ProductCategory> list = productCategoryService.findByProductId(productId);
+
+        List<ProductCategoryDTO> dtos = list.stream()
+            .map(pc -> new ProductCategoryDTO(
+                pc.getProduct().getId(),
+                pc.getProduct().getName(),
+                pc.getCategory().getId(),
+                pc.getCategory().getName()
+            ))
+            .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 
+
     /**
-     * Obtener relaciones por categoría.
+     * Obtener todas las relaciones activas de productos asociadas a una categoría específica.
      */
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<ProductCategory>> getByCategory(@PathVariable int categoryId) {
-        return ResponseEntity.ok(productCategoryService.findByCategoryId(categoryId));
+    public ResponseEntity<List<ProductCategoryDTO>> getByCategory(@PathVariable int categoryId) {
+        List<ProductCategory> list = productCategoryService.findByCategoryId(categoryId);
+
+        List<ProductCategoryDTO> dtos = list.stream()
+            .map(pc -> new ProductCategoryDTO(
+                pc.getProduct().getId(),
+                pc.getProduct().getName(),
+                pc.getCategory().getId(),
+                pc.getCategory().getName()
+            ))
+            .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 
     /**
@@ -60,6 +106,7 @@ public class ProductCategoryRestController {
      */
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody ProductCategory pc) {
+    	//System.out.println("creando" + pc.getProduct().getName() + " :: " +  pc.getCategory().getName());
         if (pc.getId() == null) {
             return ResponseEntity.badRequest()
                     .body("{\"message\": \"ProductCategory ID must not be null\"}");
@@ -77,7 +124,7 @@ public class ProductCategoryRestController {
         if (productCategoryService.findById(id).isEmpty()) {
             return ResponseEntity.status(404).body("{\"message\": \"ProductCategory not found\"}");
         }
-        productCategoryService.softDelete(id);
+        productCategoryService.delete(id);
         return ResponseEntity.ok("{\"message\": \"ProductCategory deleted successfully\"}");
     }
 }

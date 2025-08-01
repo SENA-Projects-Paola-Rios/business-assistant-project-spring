@@ -43,6 +43,17 @@ public class ProductCategoryService {
             return true;
         }).orElse(false);
     }
+    
+    // Borrado fisico
+    @Transactional
+    public boolean delete(ProductCategoryId id) {
+        if (productCategoryRepository.existsById(id)) {
+            productCategoryRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
 
     // Buscar relaciones por producto
     public List<ProductCategory> findByProductId(int productId) {
