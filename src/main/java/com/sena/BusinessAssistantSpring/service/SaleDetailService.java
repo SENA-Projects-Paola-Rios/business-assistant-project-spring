@@ -46,6 +46,16 @@ public class SaleDetailService {
         }).orElse(false);
     }
 
+    // Borrado fisico
+    @Transactional
+    public boolean delete(SaleDetailId id) {
+        return saleDetailRepository.findById(id).map(detail -> {
+            saleDetailRepository.delete(detail);  // Borrado físico del registro
+            return true;
+        }).orElse(false);
+    }
+
+
     // Obtener detalles por venta
     public List<SaleDetail> findBySaleId(int saleId) {
         return saleDetailRepository.findBySaleIdAndDeletedAtIsNull(saleId);

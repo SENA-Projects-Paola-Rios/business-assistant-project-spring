@@ -1,5 +1,6 @@
 package com.sena.BusinessAssistantSpring.controller;
 
+import com.sena.BusinessAssistantSpring.dto.SaleDTO;
 import com.sena.BusinessAssistantSpring.exception.ResourceNotFoundException;
 import com.sena.BusinessAssistantSpring.model.Sale;
 import com.sena.BusinessAssistantSpring.service.SaleService;
@@ -20,30 +21,65 @@ public class SaleRestController {
     private SaleService saleService;
 
     /**
-     * Obtener todas las ventas activas.
+     * Obtener todas las ventas activas (no eliminadas).
      */
     @GetMapping
-    public ResponseEntity<List<Sale>> getAllSales() {
-        return ResponseEntity.ok(saleService.findAll());
+    public ResponseEntity<List<SaleDTO>> getAllSales() {
+        List<SaleDTO> dtos = saleService.findAll().stream()
+            .map(sale -> new SaleDTO(
+                sale.getId(),
+                sale.getSaleDate(),
+                sale.getTotal(),
+                sale.getUser().getId(),
+                sale.getUser().getName()
+            ))
+            .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 
     /**
-     * Obtener una venta por su ID.
+     * Obtener una venta específica por su ID.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getSaleById(@PathVariable int id) {
-        Optional<Sale> sale = saleService.findById(id);
-        return sale.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException("Sale with ID " + id + " not found"));
+    public ResponseEntity<SaleDTO> getSaleById(@PathVariable int id) {
+        Optional<Sale> optionalSale = saleService.findById(id);
+
+        if (optionalSale.isEmpty()) {
+            throw new ResourceNotFoundException("Sale with ID " + id + " not found");
+        }
+
+        Sale sale = optionalSale.get();
+
+        SaleDTO dto = new SaleDTO(
+            sale.getId(),
+            sale.getSaleDate(),
+            sale.getTotal(),
+            sale.getUser().getId(),
+            sale.getUser().getName()
+        );
+
+        return ResponseEntity.ok(dto);
     }
 
     /**
-     * Obtener ventas realizadas por un usuario específico.
+     * Obtener todas las ventas realizadas por un usuario específico.
      */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Sale>> getSalesByUserId(@PathVariable int userId) {
-        return ResponseEntity.ok(saleService.findByUserId(userId));
+    public ResponseEntity<List<SaleDTO>> getSalesByUserId(@PathVariable int userId) {
+        List<SaleDTO> dtos = saleService.findByUserId(userId).stream()
+            .map(sale -> new SaleDTO(
+                sale.getId(),
+                sale.getSaleDate(),
+                sale.getTotal(),
+                sale.getUser().getId(),
+                sale.getUser().getName()
+            ))
+            .toList();
+
+        return ResponseEntity.ok(dtos);
     }
+
 
     /**
      * Crear una nueva venta.

@@ -1,5 +1,6 @@
 package com.sena.BusinessAssistantSpring.controller;
 
+import com.sena.BusinessAssistantSpring.dto.SaleDetailDTO;
 import com.sena.BusinessAssistantSpring.exception.ResourceNotFoundException;
 import com.sena.BusinessAssistantSpring.model.SaleDetail;
 import com.sena.BusinessAssistantSpring.model.SaleDetailId;
@@ -21,39 +22,87 @@ public class SaleDetailRestController {
     private SaleDetailService saleDetailService;
 
     /**
-     * Obtener todos los detalles de venta activos.
+     * Obtener todos los detalles de venta activos (no eliminados lógicamente).
      */
     @GetMapping
-    public ResponseEntity<List<SaleDetail>> getAllSaleDetails() {
-        return ResponseEntity.ok(saleDetailService.findAll());
+    public ResponseEntity<List<SaleDetailDTO>> getAllSaleDetails() {
+        // Convertimos las entidades a DTOs para evitar errores de serialización con Hibernate
+        List<SaleDetailDTO> dtos = saleDetailService.findAll().stream()
+            .map(detail -> new SaleDetailDTO(
+                detail.getSale().getId(),
+                detail.getLot().getId(),
+                detail.getQuantity(),
+                detail.getLot().getManufacturerLot(),
+                detail.getLot().getProduct().getName()
+            ))
+            .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 
     /**
-     * Obtener detalles de venta por ID compuesto.
+     * Obtener un detalle de venta específico por su ID compuesto (saleId + lotId).
      */
     @GetMapping("/sale/{saleId}/lot/{lotId}")
-    public ResponseEntity<?> getSaleDetailById(@PathVariable int saleId, @PathVariable int lotId) {
+    public ResponseEntity<SaleDetailDTO> getSaleDetailById(@PathVariable int saleId, @PathVariable int lotId) {
         SaleDetailId id = new SaleDetailId(saleId, lotId);
-        Optional<SaleDetail> detail = saleDetailService.findById(id);
-        return detail.map(ResponseEntity::ok)
-                .orElseThrow(() -> new ResourceNotFoundException("SaleDetail with given keys not found"));
+        Optional<SaleDetail> optional = saleDetailService.findById(id);
+
+        if (optional.isEmpty()) {
+            throw new ResourceNotFoundException("SaleDetail with given keys not found");
+        }
+
+        SaleDetail detail = optional.get();
+
+        SaleDetailDTO dto = new SaleDetailDTO(
+            detail.getSale().getId(),
+            detail.getLot().getId(),
+            detail.getQuantity(),
+            detail.getLot().getManufacturerLot(),
+            detail.getLot().getProduct().getName()
+        );
+
+        return ResponseEntity.ok(dto);
     }
 
     /**
-     * Obtener detalles por ID de venta.
+     * Obtener todos los detalles de venta asociados a un ID de venta (saleId).
      */
     @GetMapping("/sale/{saleId}")
-    public ResponseEntity<List<SaleDetail>> getDetailsBySaleId(@PathVariable int saleId) {
-        return ResponseEntity.ok(saleDetailService.findBySaleId(saleId));
+    public ResponseEntity<List<SaleDetailDTO>> getDetailsBySaleId(@PathVariable int saleId) {
+        // Se filtran los detalles asociados a la venta y se mapean a DTOs
+        List<SaleDetailDTO> dtos = saleDetailService.findBySaleId(saleId).stream()
+            .map(detail -> new SaleDetailDTO(
+                detail.getSale().getId(),
+                detail.getLot().getId(),
+                detail.getQuantity(),
+                detail.getLot().getManufacturerLot(),
+                detail.getLot().getProduct().getName()
+            ))
+            .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 
     /**
-     * Obtener detalles por ID de lote.
+     * Obtener todos los detalles de venta asociados a un ID de lote (lotId).
      */
     @GetMapping("/lot/{lotId}")
-    public ResponseEntity<List<SaleDetail>> getDetailsByLotId(@PathVariable int lotId) {
-        return ResponseEntity.ok(saleDetailService.findByLotId(lotId));
+    public ResponseEntity<List<SaleDetailDTO>> getDetailsByLotId(@PathVariable int lotId) {
+        // Se filtran los detalles por lote y se transforman a DTOs
+        List<SaleDetailDTO> dtos = saleDetailService.findByLotId(lotId).stream()
+            .map(detail -> new SaleDetailDTO(
+                detail.getSale().getId(),
+                detail.getLot().getId(),
+                detail.getQuantity(),
+                detail.getLot().getManufacturerLot(),
+                detail.getLot().getProduct().getName()
+            ))
+            .toList();
+
+        return ResponseEntity.ok(dtos);
     }
+
 
     /**
      * Crear nuevo detalle de venta.
@@ -77,7 +126,7 @@ public class SaleDetailRestController {
         if (saleDetailService.findById(id).isEmpty()) {
             return ResponseEntity.status(404).body("{\"message\": \"SaleDetail not found\"}");
         }
-        saleDetailService.softDelete(id);
+        saleDetailService.delete(id);
         return ResponseEntity.ok("{\"message\": \"SaleDetail deleted successfully\"}");
     }
 }
