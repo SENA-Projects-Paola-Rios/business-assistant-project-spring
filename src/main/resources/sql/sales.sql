@@ -1,0 +1,1 @@
+SELECT * FROM sale WHERE user_id = :user_id AND total >= :total;
