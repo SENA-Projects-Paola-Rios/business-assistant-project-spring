@@ -79,6 +79,8 @@ public class UserRestController {
             return ResponseEntity.status(404).body("{\"message\": \"User not found\"}");
         }
         user.setId(id);
+     // Encriptar la contraseña antes de guardar
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.update(user);
         return ResponseEntity.ok("{\"message\": \"User updated successfully\"}");
     }
