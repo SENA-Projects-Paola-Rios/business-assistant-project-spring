@@ -33,7 +33,8 @@ public class SaleDetailRestController {
                 detail.getLot().getId(),
                 detail.getQuantity(),
                 detail.getLot().getManufacturerLot(),
-                detail.getLot().getProduct().getName()
+                detail.getLot().getProduct().getName(),
+                detail.getLot().getProduct().getPrice()
             ))
             .toList();
 
@@ -59,7 +60,8 @@ public class SaleDetailRestController {
             detail.getLot().getId(),
             detail.getQuantity(),
             detail.getLot().getManufacturerLot(),
-            detail.getLot().getProduct().getName()
+            detail.getLot().getProduct().getName(),
+            detail.getLot().getProduct().getPrice()
         );
 
         return ResponseEntity.ok(dto);
@@ -77,7 +79,8 @@ public class SaleDetailRestController {
                 detail.getLot().getId(),
                 detail.getQuantity(),
                 detail.getLot().getManufacturerLot(),
-                detail.getLot().getProduct().getName()
+                detail.getLot().getProduct().getName(),
+                detail.getLot().getProduct().getPrice()
             ))
             .toList();
 
@@ -96,7 +99,8 @@ public class SaleDetailRestController {
                 detail.getLot().getId(),
                 detail.getQuantity(),
                 detail.getLot().getManufacturerLot(),
-                detail.getLot().getProduct().getName()
+                detail.getLot().getProduct().getName(),
+                detail.getLot().getProduct().getPrice()
             ))
             .toList();
 

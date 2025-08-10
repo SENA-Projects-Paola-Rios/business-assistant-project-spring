@@ -1,5 +1,7 @@
 package com.sena.BusinessAssistantSpring.dto;
 
+import java.math.BigDecimal;
+
 public class SaleDetailDTO {
 
     private Integer saleId;
@@ -7,15 +9,19 @@ public class SaleDetailDTO {
     private Integer quantity;
     private String lotManufacturer;
     private String productName;
+    private BigDecimal productPrice; 
 
-    public SaleDetailDTO() {}
+    
 
-    public SaleDetailDTO(Integer saleId, Integer lotId, Integer quantity, String lotManufacturer, String productName) {
+	public SaleDetailDTO() {}
+
+    public SaleDetailDTO(Integer saleId, Integer lotId, Integer quantity, String lotManufacturer, String productName, BigDecimal productPrice) {
         this.saleId = saleId;
         this.lotId = lotId;
         this.quantity = quantity;
         this.lotManufacturer = lotManufacturer;
         this.productName = productName;
+        this.productPrice = productPrice;
     }
 
     // Getters y setters
@@ -58,4 +64,12 @@ public class SaleDetailDTO {
     public void setProductName(String productName) {
         this.productName = productName;
     }
+    
+    public BigDecimal getProductPrice() {
+		return productPrice;
+	}
+
+	public void setProductPrice(BigDecimal productPrice) {
+		this.productPrice = productPrice;
+	}
 }

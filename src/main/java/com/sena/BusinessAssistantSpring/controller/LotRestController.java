@@ -32,7 +32,8 @@ public class LotRestController {
                 lot.getExpirationDate(),
                 lot.getStock(),
                 lot.getProduct().getId(),
-                lot.getProduct().getName()
+                lot.getProduct().getName(),
+                lot.getProduct().getPrice()
             ))
             .toList();
 
@@ -58,7 +59,8 @@ public class LotRestController {
             entity.getExpirationDate(),
             entity.getStock(),
             entity.getProduct().getId(),
-            entity.getProduct().getName()
+            entity.getProduct().getName(),
+            entity.getProduct().getPrice()
         );
 
         return ResponseEntity.ok(dto);
