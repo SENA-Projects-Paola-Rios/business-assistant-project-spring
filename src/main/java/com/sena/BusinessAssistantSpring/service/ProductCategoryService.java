@@ -53,6 +53,13 @@ public class ProductCategoryService {
         }
         return false;
     }
+    
+    // Borrado fisico de el productcategory por el product id
+    @Transactional
+    public void deleteByProductId(int productId) {
+        productCategoryRepository.deleteByProductId(productId);
+        
+    }
 
 
     // Buscar relaciones por producto

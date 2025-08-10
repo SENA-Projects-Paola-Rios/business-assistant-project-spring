@@ -1,7 +1,10 @@
 package com.sena.BusinessAssistantSpring.repository;
 
 import com.sena.BusinessAssistantSpring.model.Product;
+
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,4 +20,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     // Verifica si existe un producto con el mismo nombre pero distinto ID (para evitar duplicados al actualizar)
     boolean existsByNameAndIdNot(String name, Integer id);
+    
+    
 }

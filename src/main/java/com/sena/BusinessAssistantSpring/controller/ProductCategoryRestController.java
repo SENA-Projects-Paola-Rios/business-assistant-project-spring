@@ -5,6 +5,7 @@ import com.sena.BusinessAssistantSpring.exception.ResourceNotFoundException;
 import com.sena.BusinessAssistantSpring.model.ProductCategory;
 import com.sena.BusinessAssistantSpring.model.ProductCategoryId;
 import com.sena.BusinessAssistantSpring.service.ProductCategoryService;
+import com.sena.BusinessAssistantSpring.service.ProductService;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class ProductCategoryRestController {
 
     @Autowired
     private ProductCategoryService productCategoryService;
+    
+    @Autowired
+    private ProductService productService;
 
     /**
      * Obtener todas las asociaciones activas entre productos y categorías.
@@ -126,5 +130,21 @@ public class ProductCategoryRestController {
         }
         productCategoryService.delete(id);
         return ResponseEntity.ok("{\"message\": \"ProductCategory deleted successfully\"}");
+    }
+    
+    /**
+     * Eliminar todas las relaciones y registros asociados a un producto por productId
+     */
+    @DeleteMapping("/product/{productId}/categories")
+    public ResponseEntity<?> deleteProductAssociations(@PathVariable int productId) {
+        // Verificar si el producto existe (opcional)
+        if (productService.findById(productId).isEmpty()) {
+            return ResponseEntity.status(404).body("{\"message\": \"Product not found\"}");
+        }
+
+        // Se eliminan las categories asociadas:
+        productCategoryService.deleteByProductId(productId);
+
+        return ResponseEntity.ok("{\"message\": \"All categories of the product deleted successfully\"}");
     }
 }

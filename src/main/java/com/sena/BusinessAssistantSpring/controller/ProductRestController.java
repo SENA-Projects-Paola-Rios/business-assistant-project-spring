@@ -1,5 +1,6 @@
 package com.sena.BusinessAssistantSpring.controller;
 
+import com.sena.BusinessAssistantSpring.dto.ProductDTO;
 import com.sena.BusinessAssistantSpring.exception.ResourceNotFoundException;
 import com.sena.BusinessAssistantSpring.model.Product;
 import com.sena.BusinessAssistantSpring.service.ProductService;
@@ -9,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -23,8 +26,8 @@ public class ProductRestController {
      * Obtener todos los productos activos (no eliminados).
      */
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.findAll();
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        List<ProductDTO> products = productService.findAllActiveWithCategories();
         return ResponseEntity.ok(products);
     }
 
@@ -47,8 +50,16 @@ public class ProductRestController {
             return ResponseEntity.badRequest()
                     .body("{\"message\": \"Product ID must be null when creating a new product\"}");
         }
-        productService.save(product);
-        return ResponseEntity.ok("{\"message\": \"Product created successfully\"}");
+        /*productService.save(product);
+        return ResponseEntity.ok("{\"message\": \"Product created successfully\"}");*/
+        Product savedProduct = productService.save(product);
+        
+        // Devuelve el ID generado y un mensaje de éxito
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Product created successfully");
+        response.put("id", savedProduct.getId());
+        
+        return ResponseEntity.ok(response);
     }
 
     /**
