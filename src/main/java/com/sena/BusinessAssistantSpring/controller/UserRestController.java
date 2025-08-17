@@ -80,7 +80,16 @@ public class UserRestController {
         }
         user.setId(id);
      // Encriptar la contraseña antes de guardar
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        
+     // Si no envían contraseña, se preserva la actual
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            user.setPassword(user.getPassword());
+        } else {
+            // Si envían una nueva, se encripta
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        
         userService.update(user);
         return ResponseEntity.ok("{\"message\": \"User updated successfully\"}");
     }
