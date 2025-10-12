@@ -15,7 +15,7 @@ public class WebConfig {
         CorsConfiguration config = new CorsConfiguration();
         
         // Permitimos la URL del frontend
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost"));
         
         // Permitimos credenciales (cookies, auth headers)
         config.setAllowCredentials(true);

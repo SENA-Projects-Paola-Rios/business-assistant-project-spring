@@ -26,7 +26,7 @@ public class AuthFilter implements Filter {
         boolean isLoginRequest = uri.endsWith("/login") || uri.contains("/css") || uri.contains("/js") || uri.contains("/img");
 
         // Evitar filtrar rutas API (como /api/auth/login)
-        boolean isApiRequest = uri.startsWith("/api/");
+        boolean isApiRequest = uri.contains("/api/");
 
         if (isLoggedIn || isLoginRequest || isApiRequest) {
             chain.doFilter(request, response);

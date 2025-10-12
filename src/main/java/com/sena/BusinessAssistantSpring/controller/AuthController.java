@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -56,23 +57,31 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
-    	
-    	
         try {
+            // Intentar autenticar con email y contraseña
             authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
             );
-            
+
+            // Cargar detalles del usuario
             final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
             final String jwt = jwtUtil.generateToken(userDetails);
 
+            // Retornar token si todo sale bien
             return ResponseEntity.ok(Map.of("token", jwt));
 
-        } catch (Exception e) {
-        	e.printStackTrace();
+        } catch (BadCredentialsException e) {
+            // Si las credenciales son incorrectas, retornar 401
             return ResponseEntity
                     .status(401)
-                    .body(Map.of("error", "Invalid email or password", "details", e.getMessage()));
+                    .body(Map.of("error", "Invalid email or password"));
+        } catch (Exception e) {
+            // Capturar cualquier otro error inesperado
+            e.printStackTrace();
+            return ResponseEntity
+                    .status(500)
+                    .body(Map.of("error", "Unexpected error", "details", e.getMessage()));
         }
     }
+
 }
