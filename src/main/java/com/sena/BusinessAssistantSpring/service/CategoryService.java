@@ -36,7 +36,16 @@ public class CategoryService {
     public Category save(Category category) {
         List<ObjectError> businessErrors = new ArrayList<>();
 
-        if (categoryRepository.existsByName(category.getName())) {
+        boolean nameInUse;
+        if (category.getId() != null) {
+            // Estamos editando, ignoramos la categoría actual
+            nameInUse = categoryRepository.existsByNameAndIdNot(category.getName(), category.getId());
+        } else {
+            // Estamos creando
+            nameInUse = categoryRepository.existsByName(category.getName());
+        }
+
+        if (nameInUse) {
             businessErrors.add(new ObjectError("name", "The category name is already in use"));
         }
 
